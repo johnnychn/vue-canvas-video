@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>VueMovieClip</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!--<script src="https://cdn.artisans.net.cn/vconsole.min.js"></script>-->
+    <script src="http://cdnst.immomo.com/momofes/js/mobile/momo_bridge.2.0.4.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<style>
+
+    body, html {
+        padding: 0px;
+        margin: 0px;
+        width: 100%;
+        height: 100%;
+        font-family: 'PingFang SC', 'Helvetica Neue', 'Helvetica', 'STHeitiSC-Light', 'Arial', sans-serif;
+
+
+    }
+
+    #app,.full {
+        width: 100%;
+        height: 100%;
+        background: red;
+    }
+
+    .btn {
+        padding: 5px 10px 5px 10px;
+        background: #2b81af;
+        color: #fff;
+        float: left;
+        margin: 3px;
+        cursor: pointer;
+        -webkit-user-select: none;
+    }
+
+    .btn:hover {
+        padding: 5px 10px 5px 10px;
+        background: #ff0000;
+
+    }
+    .pa{
+        position: absolute;
+        bottom:0px;
+        left: 0px;
+        width: 100%;
+        height: 140px;
+        color: #fff;
+
+    }
+
+
+</style>
+<body>
+<div id="app">
+    <div class="full">
+
+            <vue-canvas-video  :debug="true" ref="my_movieclip"  type="canvas" v-show="true"  :render="render"
+                            @frame="onFrame" @play="onPlay" @stop="onStop" style="left:0px;top:0px;position:absolute ">
+            </vue-canvas-video>
+
+    </div>
+    <div class="pa">
+
+
+
+    <div style="height: 45px">
+        <div style="padding-left: 10px;width:110px;">frame:</div>
+        <vue-slider style="" ref="slider" :speed="0" v-model="frame" tooltip="hover"
+                    @callback="sliderCallback"
+                     :width="360" :min="1" :max="totalFrames"></vue-slider>
+    </div>
+    <div style="height: 45px;clear: both">
+        <div style="padding-left: 10px;width:110px">frameTime:</div>
+        <vue-slider  ref="slider2" v-model="frameTime" tooltip="hover"
+                    :width="360"   :max="100"></vue-slider>
+    </div>
+    <div style="clear: both">
+        <div class="btn" @click="switchState()">{{state}}</div>
+        <div class="btn" @click="switchLoop()">loop:{{loop}}</div>
+        <div class="btn" @click="switchForward()">forward:{{forward}}</div>
+        <div class="btn" @click="switchRender()">forward:{{render}}</div>
+    </div>
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="dist/slider.js"></script>
+<script src="dist/wechat_sound.js"></script>
+<script src="dist/vue-canvas-video.js"></script>
+<script>
+    // var vConsole = new VConsole();
+
+    let clips = [{src:'img/caidao_1.jpg',clipFrames:160,row:16},{src:'img/caidao_2.jpg',clipFrames:160,row:16},{src:'img/caidao_3.jpg',clipFrames:18,row:16}];
+
+
+    let poster='img/poster.jpg'
+
+
+    let audio=new Audio()
+    audio.src='img/caidao.mp3';
+
+
+    let video={clips:clips,audio:audio,poster:poster,forward:true,frameTime:50,loop:2,autoPlay:false,initFrame:1,width:360,height:480}
+
+    let video2={clips:clips,audio:audio,poster:poster,forward:true,frameTime:50,loop:2,autoPlay:false,initFrame:1,width:360,height:480}
+
+
+    new Vue({
+        el: '#app',
+        components: {
+            VueCanvasVideo: VueCanvasVideo, vueSlider: window['vue-slider-component']
+        },
+        data: {
+            frame: 1, video:video, frameTime: 1000/20, state: 'stop', loop: 2, forward: true,render:true,
+            page: 1, show: false,totalFrames:600
+        },
+        mounted:function () {
+
+       //     this.$refs.my_movieclip.play();
+
+
+
+
+
+        },
+        methods: {
+            sliderCallback: function (value) {
+                this.$refs.my_movieclip.skipTo(value);
+            },
+            switchLoop: function () {
+               // this.loop = !this.loop
+            }, switchForward: function () {
+                this.forward = !this.forward
+            },
+            switchRender: function () {
+                this.render = !this.render
+            },
+
+            switchState: function () {
+                if (this.$refs.my_movieclip.playing) {
+                    this.$refs.my_movieclip.stop();
+                } else {
+                    this.$refs.my_movieclip.initVideo(video2);
+                    this.$refs.my_movieclip.play();
+
+                }
+            },
+            updateState: function () {
+                this.state = this.$refs.my_movieclip.playing ? 'stop' : 'play'
+            },
+
+            setFrameTime: function (frameTime) {
+                this.$refs.my_movieclip.setFrameTime(frameTime);
+                this.frameTime = this.$refs.my_movieclip.frameTime;
+             //   console.log(this.frameTime)
+            },
+            skipTo: function (frame) {
+                this.$refs.my_movieclip.skipTo(frame);
+            },
+            onFrame: function (mc) {
+                this.frame = mc.frame;
+                // this.width=640-this.frame;
+                // console.log(mc.frame)
+            },
+            onPlay: function (mc) {
+                this.updateState()
+            },
+            onStop: function (mc) {
+
+
+                this.updateState()
+                //  this.$refs.my_movieclip.skipTo(1);
+            }
+        }
+    })
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+
+dist/
+node_modules/
+.idea/
+img/
+
+.idea/jsLibraryMappings.xml
+
+.idea/libraries/vue_movie_clip_node_modules.xml
+
+.idea/vcs.xml
